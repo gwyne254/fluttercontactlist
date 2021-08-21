@@ -1,6 +1,6 @@
 # Flutter Contact List demonstration
 
 
-![Alt text](screenshots/flutter_01.png?raw=true "Home Screen")
+![Alt text](./lib/screenshots/flutter_01.png?raw=true "Home Screen")
 
-![plot](./screenshots/flutter_01.png)
+![plot](./lib/screenshots/flutter_01.png)
