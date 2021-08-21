@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttercontactlist/models/contact.dart';
+import 'package:fluttercontactlist/util/database_helper.dart';
 
 void main() {
   runApp(MyApp());
@@ -38,6 +39,26 @@ class _MyHomePageState extends State<MyHomePage> {
   //other state properties
   final _formKey = GlobalKey<FormState>();
 
+  final _ctrlName = TextEditingController();
+  final _ctrlMobile = TextEditingController();
+
+  // ================DB================
+  DatabaseHelper _dbHelper;
+
+  @override
+  void initState() {
+    super.initState();
+    _dbHelper = DatabaseHelper.instance;
+    _refreshContactList();
+  }
+
+  _refreshContactList() async {
+    List<Contact> x = await _dbHelper.fetchContacts();
+    setState(() {
+      _contacts = x;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,13 +89,14 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             children: <Widget>[
               TextFormField(
+                controller: _ctrlName,
                 decoration: InputDecoration(labelText: 'Full Name'),
                 validator: (val) =>
                     (val.length == 0 ? 'This field is mandatory' : null),
                 onSaved: (val) => setState(() => _contact.name = val),
               ),
               TextFormField(
-                //controller: _ctrlMobile,
+                controller: _ctrlMobile,
                 decoration: InputDecoration(labelText: 'Mobile'),
                 validator: (val) =>
                     val.length < 10 ? '10 characters required' : null,
@@ -115,7 +137,16 @@ class _MyHomePageState extends State<MyHomePage> {
                             color: darkBlueColor, fontWeight: FontWeight.bold),
                       ),
                       subtitle: Text(_contacts[index].mobile),
-                      onTap: () {},
+                      onTap: () {
+                        _showForEdit(index);
+                      },
+                      trailing: IconButton(
+                          icon: Icon(Icons.delete_sweep, color: darkBlueColor),
+                          onPressed: () async {
+                            await _dbHelper.deleteContact(_contacts[index].id);
+                            _resetForm();
+                            _refreshContactList();
+                          }),
                     ),
                     Divider(
                       height: 5.0,
@@ -133,6 +164,39 @@ class _MyHomePageState extends State<MyHomePage> {
     var form = _formKey.currentState;
     if (form.validate()) {
       form.save();
+      await _dbHelper.insertContact(_contact);
+      form.reset();
+      await _refreshContactList();
+    }
+    if (_contact.id == null)
+      await _dbHelper.insertContact(_contact);
+    else
+      await _dbHelper.updateContact(_contact);
+    _resetForm();
+  }
+
+  _resetForm() {
+    setState(() {
+      _formKey.currentState.reset();
+      _ctrlName.clear();
+      _ctrlMobile.clear();
+      _contact.id = null;
+    });
+  }
+
+  _showForEdit(index) {
+    setState(() {
+      _contact = _contacts[index];
+      _ctrlName.text = _contacts[index].name;
+      _ctrlMobile.text = _contacts[index].mobile;
+    });
+  }
+
+/*
+  _onSubmit() async {
+    var form = _formKey.currentState;
+    if (form.validate()) {
+      form.save();
       print('''
     Full Name : ${_contact.name}
     Mobile : ${_contact.mobile}
@@ -142,4 +206,5 @@ class _MyHomePageState extends State<MyHomePage> {
       form.reset();
     }
   }
+*/
 }
