@@ -35,6 +35,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Contact _contact = Contact();
   List<Contact> _contacts = [];
 
+  //other state properties
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,7 +60,32 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  _form() => Text('form goes here');
+  _form() => Container(
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: <Widget>[
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Full Name'),
+              ),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Mobile'),
+              ),
+              Container(
+                margin: EdgeInsets.all(10.0),
+                child: RaisedButton(
+                  onPressed: () {},
+                  child: Text('Submit'),
+                  color: darkBlueColor,
+                  textColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
 
   _list() => Text('list of contacts goes here');
 }
