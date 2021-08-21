@@ -69,14 +69,21 @@ class _MyHomePageState extends State<MyHomePage> {
             children: <Widget>[
               TextFormField(
                 decoration: InputDecoration(labelText: 'Full Name'),
+                validator: (val) =>
+                    (val.length == 0 ? 'This field is mandatory' : null),
+                onSaved: (val) => setState(() => _contact.name = val),
               ),
               TextFormField(
+                //controller: _ctrlMobile,
                 decoration: InputDecoration(labelText: 'Mobile'),
+                validator: (val) =>
+                    val.length < 10 ? '10 characters required' : null,
+                onSaved: (val) => setState(() => _contact.mobile = val),
               ),
               Container(
                 margin: EdgeInsets.all(10.0),
                 child: RaisedButton(
-                  onPressed: () {},
+                  onPressed: () => _onSubmit(),
                   child: Text('Submit'),
                   color: darkBlueColor,
                   textColor: Colors.white,
@@ -87,5 +94,52 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
 
-  _list() => Text('list of contacts goes here');
+  _list() => Expanded(
+        child: Card(
+          margin: EdgeInsets.fromLTRB(20, 30, 20, 0),
+          child: Scrollbar(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemBuilder: (context, index) {
+                return Column(
+                  children: <Widget>[
+                    ListTile(
+                      leading: Icon(
+                        Icons.account_circle,
+                        color: darkBlueColor,
+                        size: 40.0,
+                      ),
+                      title: Text(
+                        _contacts[index].name.toUpperCase(),
+                        style: TextStyle(
+                            color: darkBlueColor, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(_contacts[index].mobile),
+                      onTap: () {},
+                    ),
+                    Divider(
+                      height: 5.0,
+                    ),
+                  ],
+                );
+              },
+              itemCount: _contacts.length,
+            ),
+          ),
+        ),
+      );
+
+  _onSubmit() async {
+    var form = _formKey.currentState;
+    if (form.validate()) {
+      form.save();
+      print('''
+    Full Name : ${_contact.name}
+    Mobile : ${_contact.mobile}
+    ''');
+      _contacts
+          .add(Contact(id: null, name: _contact.name, mobile: _contact.mobile));
+      form.reset();
+    }
+  }
 }
