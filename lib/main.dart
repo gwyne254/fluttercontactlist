@@ -5,7 +5,7 @@ void main() {
   runApp(MyApp());
 }
 
-const darkBlueColor = Color(0xff486579);
+const darkBlueColor = Color(0xff536599);
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
